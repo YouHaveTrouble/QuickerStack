@@ -1,0 +1,11 @@
+{
+  "Type": "UseBlock",
+  "Next": {
+    "Type": "YouHaveTrouble_QuickerStacker_QuickStackToChest",
+    "RunTime": 0.5
+  },
+  "Failed": {
+    "Type": "Simple",
+    "RunTime": 0.5
+  }
+}

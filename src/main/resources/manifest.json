@@ -1,0 +1,19 @@
+{
+  "Group": "me.youhavetrouble.quickerstacker",
+  "Name": "QuickerStacker",
+  "Version": "1.0.0",
+  "Description": "Quick stack everything!",
+  "Authors": [
+    {
+      "Name": "YouHaveTrouble",
+      "Email": "youhavetrouble@youhavetrouble.me",
+      "Url": "https://yht.one"
+    }
+  ],
+  "ServerVersion": "*",
+  "Dependencies": {},
+  "OptionalDependencies": {},
+  "DisabledByDefault": false,
+  "IncludesAssetPack": false,
+  "Main": "me.youhavetrouble.quickerstacker.QuickerStacker"
+}
