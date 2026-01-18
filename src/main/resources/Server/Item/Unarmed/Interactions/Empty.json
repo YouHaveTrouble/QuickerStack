@@ -93,7 +93,12 @@
     },
     "Secondary": {
       "Interactions": [
-        "Yht_QuickerStacker_QuickStackToChest"
+        {
+          "Type": "Yht_QuickerStacker_QuickStackToChest",
+          "Effects": {
+            "ItemAnimationId": "Interact"
+          }
+        }
       ],
       "Cooldown": {
         "Id": "Yht_QuickerStacker_QuickStack",

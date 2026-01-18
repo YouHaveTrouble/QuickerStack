@@ -11,6 +11,9 @@ import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
+import com.hypixel.hytale.server.core.inventory.transaction.ListTransaction;
+import com.hypixel.hytale.server.core.inventory.transaction.MoveTransaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.client.SimpleBlockInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -40,8 +43,9 @@ public class QuickStackToChestInteraction extends SimpleBlockInteraction {
         if (!(blockState instanceof ItemContainerState containerState)) return;
         Inventory playerInventory = player.getInventory();
         if (playerInventory == null) return;
-        playerInventory.getCombinedHotbarFirst().quickStackTo(containerState.getItemContainer());
-        NotificationUtil.sendNotification(player.getPlayerRef().getPacketHandler(), "Quick stacked items to chest.");
+        ListTransaction<MoveTransaction<ItemStackTransaction>> transaction = playerInventory.getCombinedHotbarFirst().quickStackTo(containerState.getItemContainer());
+        if (transaction.size() <= 0) return;
+        NotificationUtil.sendNotification(player.getPlayerRef().getPacketHandler(), "Quick stacked "+ transaction.size() +" stacks");
     }
 
     @Override
