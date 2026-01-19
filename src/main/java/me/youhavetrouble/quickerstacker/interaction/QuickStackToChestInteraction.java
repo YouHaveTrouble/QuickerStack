@@ -16,11 +16,13 @@ import com.hypixel.hytale.server.core.inventory.transaction.ListTransaction;
 import com.hypixel.hytale.server.core.inventory.transaction.MoveTransaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.client.SimpleBlockInteraction;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.NotificationUtil;
+import me.youhavetrouble.quickerstacker.QuickerStacker;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
@@ -37,6 +39,7 @@ public class QuickStackToChestInteraction extends SimpleBlockInteraction {
         if (player == null) return;
         BlockPosition targetBlockPosition = interactionContext.getTargetBlock();
         if (targetBlockPosition == null) return;
+        if (!QuickerStacker.canInteractWithBlock(ref, world, targetBlockPosition.x, targetBlockPosition.y, targetBlockPosition.z)) return;
         WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(targetBlockPosition.x, targetBlockPosition.z));
         if (chunk == null) return;
         var blockState = chunk.getState(targetBlockPosition.x, targetBlockPosition.y, targetBlockPosition.z);
@@ -45,7 +48,9 @@ public class QuickStackToChestInteraction extends SimpleBlockInteraction {
         if (playerInventory == null) return;
         ListTransaction<MoveTransaction<ItemStackTransaction>> transaction = playerInventory.getCombinedHotbarFirst().quickStackTo(containerState.getItemContainer());
         if (transaction.size() <= 0) return;
-        NotificationUtil.sendNotification(player.getPlayerRef().getPacketHandler(), "Quick stacked "+ transaction.size() +" stacks");
+        PlayerRef playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+        if (playerRef == null) return;
+        NotificationUtil.sendNotification(playerRef.getPacketHandler(), "Quick stacked "+ transaction.size() +" stacks");
     }
 
     @Override
