@@ -2,7 +2,6 @@ package me.youhavetrouble.quickerstacker.interaction;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.util.ChunkUtil;
@@ -10,6 +9,7 @@ import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.BlockPosition;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.protocol.packets.interface_.NotificationStyle;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.Inventory;
@@ -47,23 +47,24 @@ public class QuickStackToNearbyChestsInteraction extends SimpleBlockInteraction 
         if (player == null) return;
         PlayerRef playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
         if (playerRef == null) return;
-        NotificationUtil.sendNotification(playerRef.getPacketHandler(), "Second interaction firing");
-
         BlockPosition targetBlockPosition = interactionContext.getTargetBlock();
         if (targetBlockPosition == null) return;
         Collection<ItemContainerState> nearbyContainers = getNearbyContainers(world, ref, ref.getStore(), 10);
-
         if (nearbyContainers.isEmpty()) return;
         Inventory playerInventory = player.getInventory();
         if (playerInventory == null) return;
-        int totalStacksMoved = 0;
+        int itemsMoved = 0;
         for (ItemContainerState containerState : nearbyContainers) {
             ItemContainer itemContainer = containerState.getItemContainer();
             ListTransaction<MoveTransaction<ItemStackTransaction>> transaction = playerInventory.getCombinedHotbarFirst().quickStackTo(itemContainer);
-            totalStacksMoved += transaction.size();
+            for (var tr : transaction.getList()) {
+                ItemStack item = tr.getAddTransaction().getQuery();
+                if (item == null) continue;
+                itemsMoved += item.getQuantity();
+            }
         }
-        if (totalStacksMoved <= 0) return;
-        NotificationUtil.sendNotification(playerRef.getPacketHandler(), "Quick stacked "+ totalStacksMoved +" stacks");
+        if (itemsMoved <= 0) return;
+        NotificationUtil.sendNotification(playerRef.getPacketHandler(), "Quick stacked "+ itemsMoved +" items to nearby containers", NotificationStyle.Success);
     }
 
     @Override
@@ -94,9 +95,9 @@ public class QuickStackToNearbyChestsInteraction extends SimpleBlockInteraction 
                             (int) (position.getY() + y),
                             (int) (position.getZ() + z))
                     ) continue;
-                    WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(position.x, position.z));
+                    WorldChunk chunk = world.getChunk(ChunkUtil.indexChunkFromBlock(position.getX() + x, position.getZ() + z));
                     if (chunk == null) continue;
-                    var blockState = chunk.getState((int) position.x, (int) position.y, (int) position.z);
+                    var blockState = chunk.getState((int) position.getX() + x, (int) position.getY() + y, (int) position.getZ() + z);
                     if (!(blockState instanceof ItemContainerState containerState)) continue;
                     foundContainers.add(containerState);
                 }

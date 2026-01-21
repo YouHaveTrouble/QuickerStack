@@ -7,6 +7,8 @@ import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.BlockPosition;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.protocol.packets.interface_.NotificationStyle;
+import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.Inventory;
@@ -50,7 +52,14 @@ public class QuickStackToChestInteraction extends SimpleBlockInteraction {
         if (transaction.size() <= 0) return;
         PlayerRef playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
         if (playerRef == null) return;
-        NotificationUtil.sendNotification(playerRef.getPacketHandler(), "Quick stacked "+ transaction.size() +" stacks");
+        int itemsMoved = 0;
+        for (var tr : transaction.getList()) {
+            ItemStack item = tr.getAddTransaction().getQuery();
+            if (item == null) continue;
+            itemsMoved += item.getQuantity();
+        }
+        if (itemsMoved <= 0) return;
+        NotificationUtil.sendNotification(playerRef.getPacketHandler(), "Quick stacked "+ itemsMoved +" items", NotificationStyle.Success);
     }
 
     @Override
