@@ -68,8 +68,6 @@ public class QuickerStacker extends JavaPlugin {
                     System.out.println("Error modifying interactions for block type: " + block.getId());
                     continue;
                 }
-                System.out.println(block.getId());
-                System.out.println(block.getInteractions().get(InteractionType.Secondary));
             }
         });
 
